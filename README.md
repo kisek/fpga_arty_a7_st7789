@@ -2,7 +2,7 @@
 
 This is a sample project of ST7789 TFT LCD display module (240x240 pixels) for Arty A7-35T FPGA board. 
 Please connect the display module to the **Pmod JC** connector on the Arty A7 as shown in the following image.
-
+Arty A7-35T has four Pmod ports named JA, JB, JC, and JD.
 
 ![arty_st7789](https://github.com/user-attachments/assets/3a54b025-9869-4ea1-940a-8fc95e305e4c)
 

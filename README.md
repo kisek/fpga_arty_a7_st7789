@@ -10,3 +10,5 @@ The recommented version is **Vivado 2024.1**.
 When creating a Vivado project, please select **xc7a35ticsg324-1L** as an FPGA. 
 Please add **main.v** and **main.xdc** to your Vivado project. 
 
+Once the FPGA configuration is complete, you will see the green, blue, and white image shown above.
+

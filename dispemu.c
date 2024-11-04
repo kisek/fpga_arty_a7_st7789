@@ -47,7 +47,7 @@ int main(int argc, char** argv)
                                WhitePixel( display, DefaultScreen(display) ),
                                BlackPixel( display, DefaultScreen(display) ) );
     XMapWindow( display, win );
-    XStoreName( display, win, "Simple display emulator for RV-PC");
+    XStoreName( display, win, "Simple display emulator");
     XSelectInput( display, win, ExposureMask );
     while( 1 ){
         XNextEvent( display, &event );

@@ -12,7 +12,7 @@ Please add **main.v** and **main.xdc** to your Vivado project.
 
 Once the FPGA configuration is complete, you will see the green, blue, and white image shown above.
 
-## Simulation
+## RTL Simulation
 
 You can simulate this module in a Linux GUI environment.
 Please see the Makefile for instructions on how to compile and run the simulation.

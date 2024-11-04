@@ -3,6 +3,12 @@
 /*********************************************************************************************/
 `default_nettype none
 
+`ifdef SYNTHESIS  
+`define WAIT_CNT 100
+`else
+`define WAIT_CNT 3
+`endif
+  
 /*********************************************************************************************/
 module m_main(
     input  wire w_clk,          // main clock signal (100MHz)
@@ -20,10 +26,14 @@ module m_main(
     reg [7:0] r_x = 0;
     reg [7:0] r_y = 0;
     reg [7:0] r_d = 0;
+    reg [7:0] r_wait = 1;
     always @(posedge w_clk) begin
         r_x <= (r_x==239) ? 0 : r_x + 1;
         r_y <= (r_y==239 && r_x==239) ? 0 : (r_x==239) ? r_y + 1 : r_y;
-        r_d <= (r_y==0 && r_x==0) ? r_d + 1 : r_d;
+        if(r_y==0 && r_x==0) begin
+            r_wait <= (r_wait>=`WAIT_CNT) ? 1 : r_wait + 1;
+            if(r_wait==1) r_d <= r_d + 1;
+        end
     end
     
     reg [15:0] r_st_wadr  = 0;
@@ -36,8 +46,8 @@ module m_main(
     
     reg [15:0] vmem [0:65535]; // video memory, 256 x 256 (65,536) x 16bit color
     always @(posedge w_clk) if(r_st_we) begin
+        if(vmem[r_st_wadr]!=r_st_wdata) $write("@D%0d_%0d\n", r_st_wadr, r_st_wdata);
         vmem[r_st_wadr] <= r_st_wdata;
-        $write("@D%0d_%0d\n", r_st_wadr, r_st_wdata);
     end
     
     wire [1:0]  w_mode = w_button[0] + w_button[1] + w_button[2] + w_button[3];

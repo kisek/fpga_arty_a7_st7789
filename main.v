@@ -19,21 +19,26 @@ module m_main(
     
     reg [7:0] r_x = 0;
     reg [7:0] r_y = 0;
+    reg [7:0] r_d = 0;
     always @(posedge w_clk) begin
         r_x <= (r_x==239) ? 0 : r_x + 1;
-        r_y <= (r_y==239) ? 0 : (r_x==239) ? r_y + 1 : r_y;
+        r_y <= (r_y==239 && r_x==239) ? 0 : (r_x==239) ? r_y + 1 : r_y;
+        r_d <= (r_y==0 && r_x==0) ? r_d + 1 : r_d;
     end
     
-    reg [15:0] r_st_wadr  = 0; //{ r_y[7:0], r_sx[7:0]};
-    reg        r_st_we    = 0; // cam_we && (r_sx<256) && (r_y<256);
-    reg [15:0] r_st_wdata = 0; // cam_dout;
+    reg [15:0] r_st_wadr  = 0;
+    reg        r_st_we    = 0;
+    reg [15:0] r_st_wdata = 0;
     always @(posedge w_clk) r_st_wadr  <= {r_y, r_x};
     always @(posedge w_clk) r_st_we    <= 1; 
-    always @(posedge w_clk) r_st_wdata <= (r_x<10 && r_y<20) ? 16'hffff : 
+    always @(posedge w_clk) r_st_wdata <= (r_x<r_d && r_y<r_d) ? 16'hffff : 
                                           (r_x<r_y) ? 16'b11111100000 : 16'b11111;
     
-    reg [15:0] vmem [0:65535]; // video memory, 256 x 256 (65,536) x 12bit color
-    always @(posedge w_clk) if(r_st_we) vmem[r_st_wadr] <= r_st_wdata;
+    reg [15:0] vmem [0:65535]; // video memory, 256 x 256 (65,536) x 16bit color
+    always @(posedge w_clk) if(r_st_we) begin
+        vmem[r_st_wadr] <= r_st_wdata;
+        $write("@D%0d_%0d\n", r_st_wadr, r_st_wdata);
+    end
     
     wire [1:0]  w_mode = w_button[0] + w_button[1] + w_button[2] + w_button[3];
     wire [15:0] w_raddr;

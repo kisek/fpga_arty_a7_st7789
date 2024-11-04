@@ -12,3 +12,10 @@ Please add **main.v** and **main.xdc** to your Vivado project.
 
 Once the FPGA configuration is complete, you will see the green, blue, and white image shown above.
 
+## Simulation
+
+You can simulate this module in a Linux GUI environment.
+Please see the Makefile for instructions on how to compile and run the simulation.
+
+![Screenshot 2024-11-04 105130](https://github.com/user-attachments/assets/0a0e261f-817b-4a9a-9a51-19ba3de40040)
+

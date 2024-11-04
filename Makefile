@@ -5,6 +5,5 @@ all:
 run:
 	obj_dir/Vtop | dispemu 2
 
-
 clean:
 	rm -r -f dispemu obj_dir

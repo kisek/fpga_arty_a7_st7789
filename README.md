@@ -25,11 +25,12 @@ Please install it by **apt install libcairo-dev** for the Ubuntu environment.
 
 ## ST7789 Diaplay module of Pmod connector
 
-The display module used in this project is not commercially available and may need to create the module by yourself.
+The display module used in this project is not commercially available and may need to create the module by yourself. 
+Please purchase (1) and (2) below.
 
-Please use [(1) this pin header (male L-type) 2×40 (80P) or similar one](https://akizukidenshi.com/catalog/g/g100148/).
+(1) [Pin header (male L-type) 2×40 (80P) or similar one](https://akizukidenshi.com/catalog/g/g100148/).
 
-(2) The display may be available [here](https://www.amazon.co.jp/s?k=st7789+240x240+tft).
+(2) The LCD display available [here](https://www.amazon.co.jp/s?k=st7789+240x240+tft).
 Please use the display with seven holes named GND, VCC, SCL, SDA, RES, DC, and BLK. 
 
 Firstly, please cut the pin header (1) of 2x40 (80 pins) to 2x6 (12 pins) for the Pmod. 

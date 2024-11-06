@@ -44,5 +44,6 @@ The display has seven holes named GND, VCC, SCL, SDA, RES, DC, and BLK. Please s
 
 **Please use a tester to ensure that GND and VCC are not connected (the resistance of these pins is not 0 ohms).**
 
-![Screenshot 2024-11-06 131305](https://github.com/user-attachments/assets/2ed6c4f5-bfe5-4cd8-b937-c0dc7564c583)
+![image](https://github.com/user-attachments/assets/3c481cfa-6eb2-4fd7-bd67-6d717e461a35)
+
 

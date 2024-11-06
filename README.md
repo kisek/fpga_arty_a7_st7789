@@ -33,10 +33,11 @@ Please purchase (1) and (2) below.
 (2) The LCD display available [here](https://www.amazon.co.jp/s?k=st7789+240x240+tft).
 Please use the display with seven holes named GND, VCC, SCL, SDA, RES, DC, and BLK. 
 
+![image](https://github.com/user-attachments/assets/005c1d02-e99e-40f3-ad2d-eb1535585c2b)
+
 Firstly, please cut the pin header (1) of 2x40 (80 pins) to 2x6 (12 pins) for the Pmod. 
 Secondly, please cut the unused six pins (5, 6, 7, 8, 9, and 10 pins) of the 2x6 (12 pins) header. 
 Thirdly, please modify two pins so that pin 11 is connected to the pin 6 location and pin 12 is connected to the pin 5 location. 
 Because the GND and VCC positions of the LCD module are reversed to the Pmod positions.
 Finally, please solder the pin header you created to the display (2).
 The display has seven holes named GND, VCC, SCL, SDA, RES, DC, and BLK. Please solder the first six holes exclude BLK. 
-

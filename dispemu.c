@@ -1,5 +1,5 @@
 /******************************************************************************/
-/* simple display_emulator ver. 0.0.6 for ST7789       ArchLab, Science Tokyo */
+/* simple display_emulator ver. 0.0.7 for ST7789       ArchLab, Science Tokyo */
 /******************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +27,7 @@ void draw_rect(cairo_t *ca, int adr, int c) // cairo_t, adr, color
 
 /******************************************************************************/
 /* format:@Daaaa_cc    (aaaa: address, cc: color)                             */
+/* compress with ex-or                                                        */
 /******************************************************************************/
 int main(int argc, char** argv)
 {
@@ -60,12 +61,18 @@ int main(int argc, char** argv)
 
     char str[4096];
     int x_in, y_in, c_in;
+    int adr_p = 0; // previous address
+    int dat_p = 0; // previous data
     while(1){
         char *p = fgets(str, 4096, stdin);
         if(str[0]=='@' && str[1]=='D'){
             if(str[2]=='f' && str[3]=='i' && str[4]=='n') break;
             sscanf(str, "@D%d_%d\n", &x_in, &c_in);
-            draw_rect( c, x_in, c_in);
+            int adr = x_in ^ adr_p;
+            int dat = c_in ^ dat_p;
+            draw_rect( c, adr, dat );
+            adr_p = adr;
+            dat_p = dat;
             XFlush( display );
         }
     }

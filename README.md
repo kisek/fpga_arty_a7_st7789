@@ -42,5 +42,7 @@ Because the GND and VCC positions of the LCD module are reversed to the Pmod pos
 Finally, please solder the pin header you created to the display (2).
 The display has seven holes named GND, VCC, SCL, SDA, RES, DC, and BLK. Please solder the first six holes exclude BLK. 
 
+**Please use a tester to ensure that GND and VCC are not connected (the resistance of these pins is not 0 ohms).**
+
 ![Screenshot 2024-11-06 131305](https://github.com/user-attachments/assets/2ed6c4f5-bfe5-4cd8-b937-c0dc7564c583)
 

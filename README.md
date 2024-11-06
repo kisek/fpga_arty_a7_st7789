@@ -35,4 +35,5 @@ Secondly, please cut the unused six pins (5, 6, 7, 8, 9, and 10 pins) of the 2x6
 Thirdly, please modify two pins so that pin 11 is connected to the pin 6 location and pin 12 is connected to the pin 5 location. 
 Because the GND and VCC positions of the LCD module are reversed to the Pmod positions.
 Finally, please solder the pin header you created to the display (2).
+The display has seven holes named GND, VCC, SCL, SDA, RES, DC, and BLK. Please solder the first six holes exclude BLK. 
 

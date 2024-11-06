@@ -28,7 +28,9 @@ Please install it by **apt install libcairo-dev** for the Ubuntu environment.
 The display module used in this project is not commercially available and may need to create the module by yourself.
 
 Please use [(1) this pin header (male L-type) 2×40 (80P) or similar one](https://akizukidenshi.com/catalog/g/g100148/).
+
 (2) The display may be available [here](https://www.amazon.co.jp/s?k=st7789+240x240+tft).
+Please use the display with seven holes named GND, VCC, SCL, SDA, RES, DC, and BLK. 
 
 Firstly, please cut the pin header (1) of 2x40 (80 pins) to 2x6 (12 pins) for the Pmod. 
 Secondly, please cut the unused six pins (5, 6, 7, 8, 9, and 10 pins) of the 2x6 (12 pins) header. 

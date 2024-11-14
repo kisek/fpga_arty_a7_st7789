@@ -1,5 +1,5 @@
 /*********************************************************************************************/
-/* 240x240 ST7789 mini display project               Ver.2024-11-06a, ArchLab, Science Tokyo */
+/* 240x240 ST7789 mini display project               Ver.2024-11-14a, ArchLab, Science Tokyo */
 /*********************************************************************************************/
 `default_nettype none
 
@@ -43,25 +43,31 @@ module m_main(
     always @(posedge w_clk) r_st_we    <= 1; 
     always @(posedge w_clk) r_st_wdata <= (r_x<r_d && r_y<r_d) ? 16'hffff : 
                                           (r_x<r_y) ? 16'b11111100000 : 16'b11111;
+  
+    wire [15:0] w_raddr;    
+    reg  [15:0] r_rdata = 0;
+    reg  [15:0] r_raddr = 0;
+    reg  [15:0] vmem [0:65535]; // video memory, 256 x 256 (65,536) x 16bit color
+    always @(posedge w_clk) begin
+        if(r_st_we) vmem[r_st_wadr] <= r_st_wdata;
+        r_rdata <= vmem[r_raddr];
+        r_raddr <= w_raddr;
+    end
+    
+`ifndef SYNTHESIS  
     reg [15:0] r_adr_p = 0;
     reg [15:0] r_dat_p = 0;
-    reg [15:0] vmem [0:65535]; // video memory, 256 x 256 (65,536) x 16bit color
     always @(posedge w_clk) if(r_st_we) begin
         if(vmem[r_st_wadr]!=r_st_wdata) begin
             r_adr_p <= r_st_wadr;
             r_dat_p <= r_st_wdata;
             $write("@D%0d_%0d\n", r_st_wadr ^ r_adr_p, r_st_wdata ^ r_dat_p);
             $fflush();
-            vmem[r_st_wadr] <= r_st_wdata;
         end
     end
-    
+`endif
+
     wire [1:0]  w_mode = w_button[0] + w_button[1] + w_button[2] + w_button[3];
-    wire [15:0] w_raddr;
-    reg [15:0] r_rdata = 0;
-    reg [15:0] r_raddr = 0;
-    always @(posedge w_clk) r_raddr <= w_raddr;
-    always @(posedge w_clk) r_rdata <= vmem[r_raddr];
     m_st7789_disp disp0 (w_clk, st7789_SDA, st7789_SCL, st7789_DC, st7789_RES,
                          w_raddr, r_rdata, w_mode);
 endmodule

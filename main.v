@@ -1,5 +1,5 @@
 /*********************************************************************************************/
-/* 240x240 ST7789 mini display project               Ver.2024-11-14a, ArchLab, Science Tokyo */
+/* 240x240 ST7789 mini display project               Ver.2024-11-23a, ArchLab, Science Tokyo */
 /*********************************************************************************************/
 `default_nettype none
 
@@ -14,14 +14,14 @@ module m_main(
     input  wire w_clk,          // main clock signal (100MHz)
     input  wire [3:0] w_button, //
     output wire [3:0] w_led,    //
-    inout  wire st7789_SDA,     //
+    output wire st7789_SDA,     //
     output wire st7789_SCL,     //
     output wire st7789_DC,      //
     output wire st7789_RES      //
 );
     reg [31:0] r_cnt = 0;
     always @(posedge w_clk) r_cnt <= r_cnt + 1;
-    assign w_led = r_cnt[30:27];
+    assign w_led = r_cnt[29:26];
     
     reg [7:0] r_x = 0;
     reg [7:0] r_y = 0;
@@ -67,28 +67,24 @@ module m_main(
     end
 `endif
 
-    wire [1:0]  w_mode = w_button[0] + w_button[1] + w_button[2] + w_button[3];
-    m_st7789_disp disp0 (w_clk, st7789_SDA, st7789_SCL, st7789_DC, st7789_RES,
-                         w_raddr, r_rdata, w_mode);
+    m_st7789_disp d1 (w_clk, st7789_SDA, st7789_SCL, st7789_DC, st7789_RES, w_raddr, r_rdata);
 endmodule
 
 /*********************************************************************************************/
 module m_st7789_disp(
     input  wire w_clk, // main clock signal (100MHz)
-    inout  wire st7789_SDA,
+    output wire st7789_SDA,
     output wire st7789_SCL,
     output wire st7789_DC,
     output wire st7789_RES,
     output wire [15:0] w_raddr,
-    input  wire [15:0] w_rdata,
-    input  wire [1:0]  w_mode
+    input  wire [15:0] w_rdata
 );
     reg [31:0] r_cnt=1;
     always @(posedge w_clk) r_cnt <= (r_cnt==0) ? 0 : r_cnt + 1;
     reg r_RES = 1;
     always @(posedge w_clk) begin
-        if      (r_cnt==10_000) r_RES <= 0;
-        else if (r_cnt==20_000) r_RES <= 1;
+        r_RES <= (r_cnt==100_000) ? 0 : (r_cnt==200_000) ? 1 : r_RES;
     end
     assign st7789_RES = r_RES;    
        
@@ -97,37 +93,31 @@ module m_st7789_disp(
     reg init_done = 0;
     reg [4:0]  r_state  = 0;   
     reg [19:0] r_state2 = 0;   
- 
     reg [8:0] r_dat = 0;
-
     reg [15:0] r_c = 16'hf800;
-    reg [15:0] r_pagecnt = 0;
    
+    reg [31:0] r_bcnt = 0;
+    always @(posedge w_clk) r_bcnt <= (busy) ? 0 : r_bcnt + 1;
+    
     always @(posedge w_clk) if(!init_done) begin
-        r_en <= (r_cnt>30_000 && !busy && r_cnt[10:0]==0); 
+        r_en <= (r_cnt>1_000_000 && !busy && r_bcnt>1_000_000); 
     end else begin
         r_en <= (!busy);
     end
     
-    always @(posedge w_clk) if(r_en && !init_done) r_state  <= r_state  + 1;
+    always @(posedge w_clk) if(r_en && !init_done) r_state <= r_state  + 1;
     
     always @(posedge w_clk) if(r_en &&  init_done) begin
         r_state2 <= (r_state2==115210) ? 0 : r_state2 + 1; // 11 + 240x240*2 = 11 + 115200 = 115211
-        if(r_state2==115210) r_pagecnt <= r_pagecnt + 1;
     end
 
     reg [7:0] r_x = 0;
     reg [7:0] r_y = 0;
-    always @(posedge w_clk) if(r_en &&  init_done && r_state2[0]==1) begin
+    always @(posedge w_clk) if(r_en && init_done && r_state2[0]==1) begin
        r_x <= (r_state2<=10 || r_x==239) ? 0 : r_x + 1;
        r_y <= (r_state2<=10) ? 0 : (r_x==239) ? r_y + 1 : r_y;
     end
-    
-    wire [7:0] w_nx = 239-r_x;
-    wire [7:0] w_ny = 239-r_y; 
-    assign w_raddr = (w_mode==0) ? {r_y, r_x} :  // default
-                     (w_mode==1) ? {r_x, w_ny} : // 90 degree rotation
-                     (w_mode==2) ? {w_ny, w_nx} : {w_nx, r_y} ; //180 degree, 240 degree rotation
+    assign w_raddr = {r_y, r_x};
     
     reg  [15:0] r_color = 0;
     always @(posedge w_clk) r_color <= w_rdata;  
@@ -182,19 +172,18 @@ endmodule
 /****** SPI send module,  SPI_MODE_2, MSBFIRST                                           *****/
 /*********************************************************************************************/
 module m_spi(
-    input  wire w_clk,       // 100KHz input clock !!
-    input  wire en,          // enable
-    input  wire [8:0] d_in,  //
-    inout  wire SDA,         // 
-    output wire SCL,         // 
-    output wire DC,          // 
+    input  wire w_clk,       // 100MHz input clock !!
+    input  wire en,          // write enable
+    input  wire [8:0] d_in,  // data in
+    output wire SDA,         // Serial Data
+    output wire SCL,         // Serial Clock
+    output wire DC,          // Data/Control
     output wire busy         // busy
 );
     reg [5:0] r_state=0;  //
     reg [7:0] r_cnt=0;    //
     reg r_SCL = 1;        //
-    reg r_SDA = 1;        //
-    reg r_DC  = 0;        // Data/Control
+    reg r_DC  = 0;        //
     reg [7:0] r_data = 0; //
 
     always @(posedge w_clk) begin
@@ -202,13 +191,12 @@ module m_spi(
             r_state <= 1;
             r_data  <= d_in[7:0];
             r_DC    <= d_in[8];
-            r_SDA   <= 0;
             r_cnt   <= 0;
         end
         else begin
             r_cnt <= (r_state==0) ? 0 : r_cnt + 1;
-            if(r_state!=0 && r_cnt==18) r_state <= 0;
             if(r_cnt>0 && r_cnt[0]==0) r_data <= {r_data[6:0], 1'b0};
+            if(r_state!=0 && r_cnt==18) r_state <= 0;
         end
     end
 

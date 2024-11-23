@@ -124,17 +124,17 @@ module m_st7789_disp(
  
     always @(posedge w_clk) begin
         case (r_state2) /////
-            0:  r_dat<={1'b0, 8'h2A};     //
-            1:  r_dat<={1'b1, 8'h00};     //
-            2:  r_dat<={1'b1, 8'h00};     //
-            3:  r_dat<={1'b1, 8'h00};     //
-            4:  r_dat<={1'b1, 8'd239};    //
-            5:  r_dat<={1'b0, 8'h2B};     //
-            6:  r_dat<={1'b1, 8'h00};     //
-            7:  r_dat<={1'b1, 8'h00};     //
-            8:  r_dat<={1'b1, 8'h00};     //
-            9:  r_dat<={1'b1, 8'd239};    //
-            10: r_dat<={1'b0, 8'h2C};     //  
+            0:  r_dat<={1'b0, 8'h2A};   // Column Address Set
+            1:  r_dat<={1'b1, 8'h00};   // [0]
+            2:  r_dat<={1'b1, 8'h00};   // [0]
+            3:  r_dat<={1'b1, 8'h00};   // [0]
+            4:  r_dat<={1'b1, 8'd239};  // [239]
+            5:  r_dat<={1'b0, 8'h2B};   // Row Address Set
+            6:  r_dat<={1'b1, 8'h00};   // [0]
+            7:  r_dat<={1'b1, 8'h00};   // [0]
+            8:  r_dat<={1'b1, 8'h00};   // [0]
+            9:  r_dat<={1'b1, 8'd239};  // [239]
+            10: r_dat<={1'b0, 8'h2C};   // Memory Write
             default: r_dat <= (r_state2[0]) ? {1'b1, r_color[15:8]} :{ 1'b1, r_color[7:0]}; 
         endcase
     end
@@ -142,26 +142,16 @@ module m_st7789_disp(
     reg [8:0] r_init = 0;
     always @(posedge w_clk) begin
         case (r_state) /////
-            0:  r_init<={1'b0, 8'h01};  //
-            1:  r_init<={1'b0, 8'h11};  //
-            2:  r_init<={1'b0, 8'h3A};  //
-            3:  r_init<={1'b1, 8'h55};  //
-            4:  r_init<={1'b0, 8'h36};  //
-            5:  r_init<={1'b1, 8'h00};  //
-            6:  r_init<={1'b0, 8'h2A};  //
-            7:  r_init<={1'b1, 8'h00};  //
-            8:  r_init<={1'b1, 8'h00};  //
-            9:  r_init<={1'b1, 8'h00};  //
-            10: r_init<={1'b1, 8'd240}; //
-            11: r_init<={1'b0, 8'h2B};  //
-            12: r_init<={1'b1, 8'h00};  //
-            13: r_init<={1'b1, 8'h00};  //
-            14: r_init<={1'b1, 8'h00};  //
-            15: r_init<={1'b1, 8'd240}; //
-            16: r_init<={1'b0, 8'h21};  //
-            17: r_init<={1'b0, 8'h13};  //
-            18: r_init<={1'b0, 8'h29};  //
-            19: init_done <= 1;
+            0:  r_init<={1'b0, 8'h01};  // Software Reset, wait 120msec
+            1:  r_init<={1'b0, 8'h11};  // Sleep Out, wait 120msec
+            2:  r_init<={1'b0, 8'h3A};  // Interface Pixel Format
+            3:  r_init<={1'b1, 8'h55};  // [65K RGB, 16bit/pixel]
+            4:  r_init<={1'b0, 8'h36};  // Memory Data Accell Control
+            5:  r_init<={1'b1, 8'h00};  // [000000]
+            6:  r_init<={1'b0, 8'h21};  // Display Inversion On
+            7:  r_init<={1'b0, 8'h13};  // Normal Display Mode On
+            8:  r_init<={1'b0, 8'h29};  // Display On
+            9 : init_done <= 1;
         endcase
     end
 

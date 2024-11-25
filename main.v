@@ -175,6 +175,7 @@ module m_spi(
     reg r_SCL = 1;        //
     reg r_DC  = 0;        //
     reg [7:0] r_data = 0; //
+    reg r_SDA=0;
 
     always @(posedge w_clk) begin
         if(en && r_state==0) begin
@@ -183,16 +184,26 @@ module m_spi(
             r_DC    <= d_in[8];
             r_cnt   <= 0;
         end
-        else begin
-            r_cnt <= (r_state==0) ? 0 : r_cnt + 1;
-            if(r_cnt>0 && r_cnt[0]==0) r_data <= {r_data[6:0], 1'b0};
-            if(r_state!=0 && r_cnt==18) r_state <= 0;
+        else if (r_state==1) begin
+            r_SDA <= r_data[7];
+            r_data <= {r_data[6:0], 1'b0};
+            r_state <= 2;
+            r_cnt <= r_cnt + 1;
+        end
+        else if (r_state==2) begin
+            r_SCL <= 0;
+            r_state <= 3;
+        end
+        else if (r_state==3) begin
+            r_state <= 4;
+        end
+        else if (r_state==4) begin
+            r_SCL <= 1;
+            r_state <= (r_cnt==8) ? 0 : 1;
         end
     end
 
-    always @(posedge w_clk) if(r_state!=0 && (r_cnt>=1) && (r_cnt<=16)) r_SCL <= ~r_SCL;
-
-    assign SDA = r_data[7];
+    assign SDA = r_SDA;
     assign SCL = r_SCL;
     assign DC  = r_DC;
     assign busy = (r_state!=0 || en);

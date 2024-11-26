@@ -47,3 +47,4 @@ The display has seven holes named GND, VCC, SCL, SDA, RES, DC, and BLK. Please s
 ![image](https://github.com/user-attachments/assets/3c481cfa-6eb2-4fd7-bd67-6d717e461a35)
 
 
+![Screenshot 2024-11-26 165624](https://github.com/user-attachments/assets/de9686bc-b1bd-4783-a8e4-b5128530e62d)

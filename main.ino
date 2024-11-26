@@ -4,10 +4,10 @@
 /***** Released under the MIT license https://opensource.org/licenses/mit                    *****/
 /*************************************************************************************************/
 /** pin locations for XIAO ESP32C3 board **/
-#define TFT_DC   D7    // Data/Command
-#define TFT_RES  D8    // ST7789 Reset
-#define TFT_SDA  D9    // Software SPI
-#define TFT_SCK  D10   // Software SPI
+#define TFT_DC   D10   // Data/Command
+#define TFT_RES  D9    // ST7789 Reset
+#define TFT_SDA  D8    // Software SPI
+#define TFT_SCL  D7    // Software SPI
 
 /*************************************************************************************************/
 #define ST7789_WIDTH   240
@@ -21,8 +21,8 @@ void spi_send(int mode, uint8_t data){
 
   for (i=7; i>=0; i--) {
     digitalWrite(TFT_SDA, ((data >> i) & 1));
-    digitalWrite(TFT_SCK, LOW);
-    digitalWrite(TFT_SCK, HIGH); 
+    digitalWrite(TFT_SCL, LOW);
+    digitalWrite(TFT_SCL, HIGH); 
   }
 }
 
@@ -46,9 +46,9 @@ void sys_init() {
   pinMode(TFT_DC,  OUTPUT);
   pinMode(TFT_RES, OUTPUT);
   pinMode(TFT_SDA, OUTPUT);
-  pinMode(TFT_SCK, OUTPUT);
+  pinMode(TFT_SCL, OUTPUT);
 
-  digitalWrite(TFT_SCK, HIGH);
+  digitalWrite(TFT_SCL, HIGH);
   digitalWrite(TFT_RES, LOW);     // reset
   digitalWrite(TFT_RES, HIGH); delay(120);
 

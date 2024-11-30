@@ -51,4 +51,5 @@ The file of main.ino is an Arduino sketch.
 The following is a photo running this sketch on an XIAO ESP32C3 board.
 The I/O logic level of this board is 3.3V, so no resistors need to be connected.
 
-![Screenshot 2024-11-26 165624](https://github.com/user-attachments/assets/de9686bc-b1bd-4783-a8e4-b5128530e62d)
+![main](https://github.com/user-attachments/assets/013c5f13-6268-46b7-83e9-10a17982e1b8)
+

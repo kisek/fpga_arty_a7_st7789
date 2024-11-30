@@ -1,5 +1,5 @@
 /*************************************************************************************************/
-/***** 240x240 ST7789 mini display project, Arduino sketch  Ver.2024-11-26a                  *****/
+/***** 240x240 ST7789 mini display project, Arduino sketch  Ver.2024-11-30a                  *****/
 /***** Copyright (c) 2024 Archlab. Science Tokyo                                             *****/
 /***** Released under the MIT license https://opensource.org/licenses/mit                    *****/
 /*************************************************************************************************/
@@ -63,26 +63,65 @@ void sys_init() {
   spi_send(LOW,  0x29);             // Display On
 }
 
-#define COLOR_RED   0xF800
-#define COLOR_GREEN 0x07E0
-#define COLOR_BLUE  0x001F
 /*************************************************************************************************/
 void setup() {
   sys_init();
 }
 
 /*************************************************************************************************/
-void loop() {
-  uint16_t c = COLOR_RED;
-  while (1) {
-    init_position();
-    for (int y = 0; y < ST7789_HEIGHT; y++) {
-      for (int x = 0; x < ST7789_WIDTH; x++) {
-        spi_send(HIGH, c >> 8);
-        spi_send(HIGH, c & 0xFF);
-      }
+double x_min = 0.270851;
+double x_max = 0.270900;
+
+double y_min = 0.004641;
+double y_max = 0.004713;
+
+int    iter_max = 256; //
+int    x_pix  = 240;   // display width
+int    y_pic  = 240;   // display height
+
+/********************************************************************************/
+void draw_pixel(int x, int y, int color)
+{
+    int addr = ((x << 8) & 0xFF00) | (y & 0xFF);
+  //  printf("@D%d_%d\n", addr,  color);
+  //  fflush(stdout);
+  spi_send(HIGH, (color >> 8) & 0xFF);
+  spi_send(HIGH, (color     ) & 0xFF);
+}
+
+/********************************************************************************/
+void mandelbrot()
+{
+    double x, y;
+    int i, j, k;
+    double dx = (x_max - x_min) / x_pix;
+    double dy = (y_max - y_min) / y_pic;
+
+    y = y_min;
+    for (j = 1; j <= y_pic; j++) {
+        y += dy;
+        x = x_min;
+        for(i = 1; i <= x_pix; i++) {
+            double u  = 0.0;
+            double v  = 0.0;
+            double u2 = 0.0;
+            double v2 = 0.0;
+            x += dx;
+            for (k = 1; k < iter_max && (u2 + v2 < 4.0); k++) {
+                v = 2 * u * v + y;
+                u = u2 - v2 + x;
+                u2 = u * u;
+                v2 = v * v;
+            };
+            int color = ((k & 0x7f) << 11) ^ ((k & 0x7f) << 7) ^ (k & 0x7f);
+            draw_pixel(i, j, color);
+        }
     }
-    c = (c==COLOR_RED) ? COLOR_GREEN : (c==COLOR_GREEN) ? COLOR_BLUE : COLOR_RED;
-  }
+}
+
+/*************************************************************************************************/
+void loop() {
+  init_position();
+  mandelbrot();
 }
 /*************************************************************************************************/

@@ -1,10 +1,15 @@
-
 /*******************************************************************************************/
 /***** 240x240 ST7789 mini display project, Arduino IDE sketch  Ver.2024-12-20a        *****/
-/***** Version 2025-05-26a            Copyright (c) 2024 Archlab. Science Tokyo        *****/
+/***** Version 2025-05-26b            Copyright (c) 2024 Archlab. Science Tokyo        *****/
 /***** Released under the MIT license https://opensource.org/licenses/mit              *****/
 /*******************************************************************************************/
 #include <SPI.h>
+/*******************************************************************************************/
+int ITER_MAX = 256; // max iteration of kernel
+int X_PIX    = 240; // display width
+int Y_PIX    = 240; // display height
+int cnt      =   0; // count of frames
+/*******************************************************************************************/
 
 /** pin locations for XIAO ESP32C3 board **/
 //#define TFT_BLK       // BLK pin of ST7789 LCD -> open (connect nothing) 
@@ -17,7 +22,7 @@
 
 /* Hardware SPI, MSB_FIRST and SPI_MODE3 */
 /*******************************************************************************************/
-void spi_send(int mode, uint8_t data){
+void spi_send(int mode, uint8_t data) {
     digitalWrite(TFT_DC,  mode);
     SPI.transfer(data);
 }
@@ -39,50 +44,9 @@ void init_position() {
 }
 
 /*******************************************************************************************/
-inline void draw_pixel(int color)
-{
+inline void draw_pixel(int color) {
     SPI.transfer((color >> 8) & 0xFF);
     SPI.transfer((color     ) & 0xFF);
-}
-
-/*******************************************************************************************/
-int ITER_MAX = 256; //
-int X_PIX  = 240;   // display width
-int Y_PIX  = 240;   // display height
-
-float x_min = 0.270851;
-float x_max = 0.270900;
-float y_min = 0.004641;
-float y_max = 0.004713;
-int cnt = 0;
-
-/*******************************************************************************************/
-void mandelbrot()
-{
-    float dx = (x_max - x_min) / X_PIX;
-    float dy = (y_max - y_min) / Y_PIX;
-
-    for (int j = 1; j <= Y_PIX; j++) {
-        float y = y_min + j * dy;
-        for(int i = 1; i <= X_PIX; i++) {
-            int k;
-            float u  = 0.0;
-            float v  = 0.0;
-            float u2 = 0.0;
-            float v2 = 0.0;
-            float x = x_min + i * dx;
-            for (k = 1; k < ITER_MAX; k++) {
-                v = 2 * u * v + y;
-                u = u2 - v2 + x;
-                u2 = u * u;
-                v2 = v * v;
-                if (u2 + v2 >= 4.0) break;
-            };
-            int color = ((k & 0x7f) << 11) ^ ((k & 0x7f) << 7) ^ (k & 0x7f);
-            if(cnt&1) color = color & (0x3f << 7);
-            draw_pixel(color);
-        }
-    }
 }
 
 /*******************************************************************************************/
@@ -111,17 +75,55 @@ void setup() {
 }
 
 /*******************************************************************************************/
+float x_min_base = 0.270851;
+float x_max_base = 0.270900;
+float y_min_base = 0.004641;
+float y_max_base = 0.004713;
+float x_min = x_min_base;
+float x_max = x_max_base;
+float y_min = y_min_base;
+float y_max = y_max_base;
+
+/*******************************************************************************************/
+void mandelbrot() {
+    float dx = (x_max - x_min) / X_PIX;
+    float dy = (y_max - y_min) / Y_PIX;
+
+    for (int j = 1; j <= Y_PIX; j++) {
+        float y = y_min + j * dy;
+        for(int i = 1; i <= X_PIX; i++) {
+            int k;
+            float u  = 0.0;
+            float v  = 0.0;
+            float u2 = 0.0;
+            float v2 = 0.0;
+            float x = x_min + i * dx;
+            for (k = 1; k < ITER_MAX; k++) {
+                v = 2 * u * v + y;
+                u = u2 - v2 + x;
+                u2 = u * u;
+                v2 = v * v;
+                if (u2 + v2 >= 4.0) break;
+            };
+            int color = ((k & 0x7f) << 11) ^ ((k & 0x7f) << 7) ^ (k & 0x7f);
+            if(cnt&1) color = color & (0x3f << 7);
+            draw_pixel(color);
+        }
+    }
+}
+
+/*******************************************************************************************/
 void loop() {
     cnt = 0;
-    float delta = 0.0000020;
+    float delta = 0.0000050;
     
     while(1){
-        if(cnt%512==0) delta = delta * -1;
-        y_max += delta;
-        x_max += delta;
+        y_max = y_max_base + delta * cnt;
+        x_max = x_max_base + delta * cnt;
         init_position();
         mandelbrot();
-        cnt++;  
+        cnt++;
+        if(cnt>31) cnt = 0;
     }
 }
 /*******************************************************************************************/

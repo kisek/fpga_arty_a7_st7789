@@ -1,6 +1,7 @@
+
 /*******************************************************************************************/
 /***** 240x240 ST7789 mini display project, Arduino IDE sketch  Ver.2024-12-20a        *****/
-/***** Copyright (c) 2024 Archlab. Science Tokyo                                       *****/
+/***** Version 2025-05-26a            Copyright (c) 2024 Archlab. Science Tokyo        *****/
 /***** Released under the MIT license https://opensource.org/licenses/mit              *****/
 /*******************************************************************************************/
 #include <SPI.h>
@@ -53,7 +54,7 @@ float x_min = 0.270851;
 float x_max = 0.270900;
 float y_min = 0.004641;
 float y_max = 0.004713;
-int iter = 0;
+int cnt = 0;
 
 /*******************************************************************************************/
 void mandelbrot()
@@ -78,7 +79,7 @@ void mandelbrot()
                 if (u2 + v2 >= 4.0) break;
             };
             int color = ((k & 0x7f) << 11) ^ ((k & 0x7f) << 7) ^ (k & 0x7f);
-            if(iter&1) color = color ^ 0xFF;
+            if(cnt&1) color = color & (0x3f << 7);
             draw_pixel(color);
         }
     }
@@ -111,10 +112,16 @@ void setup() {
 
 /*******************************************************************************************/
 void loop() {
-    init_position();
-    mandelbrot();
-    y_min += 0.000010;
-    x_min += 0.000010;
-    iter++;
+    cnt = 0;
+    float delta = 0.0000020;
+    
+    while(1){
+        if(cnt%512==0) delta = delta * -1;
+        y_max += delta;
+        x_max += delta;
+        init_position();
+        mandelbrot();
+        cnt++;  
+    }
 }
 /*******************************************************************************************/
